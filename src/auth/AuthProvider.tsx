@@ -18,6 +18,12 @@ import {
   setStoredToken,
   useDevAuth,
 } from '@/auth/config';
+import { acquireAccessToken } from '@/auth/token';
+import {
+  isAllowedOrganizationAccount,
+  organizationAccessDeniedMessage,
+  setAuthError,
+} from '@/auth/organization';
 
 interface AuthContextValue {
   isAuthenticated: boolean;
@@ -50,19 +56,33 @@ function AuthStateProvider({ children }: { children: ReactNode }) {
       .initialize()
       .then(async () => {
         const result = await instance.handleRedirectPromise();
-        if (result?.accessToken) {
-          setStoredToken(result.accessToken);
-          setToken(result.accessToken);
-        } else {
-          const accounts = instance.getAllAccounts();
-          if (accounts.length > 0) {
-            const silent = await instance.acquireTokenSilent({
-              ...loginRequest,
-              account: accounts[0],
-            });
-            setStoredToken(silent.accessToken);
-            setToken(silent.accessToken);
-          }
+        if (result?.account) {
+          instance.setActiveAccount(result.account);
+        }
+
+        const accounts = instance.getAllAccounts();
+        if (accounts.length === 0) {
+          return;
+        }
+
+        const activeAccount = result?.account ?? accounts[0];
+        instance.setActiveAccount(activeAccount);
+
+        if (!isAllowedOrganizationAccount(activeAccount)) {
+          setAuthError(organizationAccessDeniedMessage());
+          clearStoredToken();
+          setToken(null);
+          await instance.logoutRedirect({ account: activeAccount });
+          return;
+        }
+
+        try {
+          const apiToken = await acquireAccessToken();
+          setStoredToken(apiToken);
+          setToken(apiToken);
+        } catch {
+          clearStoredToken();
+          setToken(null);
         }
       })
       .finally(() => setIsLoading(false));
@@ -74,7 +94,10 @@ function AuthStateProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const loginWithEntra = useCallback(async () => {
-    if (!msalInstance) return;
+    if (!msalInstance) {
+      throw new Error('Microsoft sign-in is not configured.');
+    }
+    await msalInstance.initialize();
     await msalInstance.loginRedirect(loginRequest);
   }, []);
 

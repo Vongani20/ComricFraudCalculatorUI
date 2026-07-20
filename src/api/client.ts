@@ -1,9 +1,9 @@
-import { getStoredToken, DEV_TOKEN } from '@/auth/config';
+import { acquireAccessToken } from '@/auth/token';
 
 const DEV_TENANT_KEY = 'comric.devTenantId';
 
-function getAuthHeaders(): HeadersInit {
-  const token = getStoredToken() ?? DEV_TOKEN;
+async function getAuthHeaders(): Promise<HeadersInit> {
+  const token = await acquireAccessToken();
   const headers: Record<string, string> = {
     Authorization: `Bearer ${token}`,
     'Content-Type': 'application/json',
@@ -11,6 +11,8 @@ function getAuthHeaders(): HeadersInit {
 
   const tenantId = localStorage.getItem(DEV_TENANT_KEY);
   if (tenantId) {
+    // Business tenant for RLS / event isolation (Vodacom or MTN demo GUIDs)
+    headers['X-Tenant-Id'] = tenantId;
     headers['X-Dev-TenantId'] = tenantId;
   }
 
@@ -21,17 +23,43 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
   const response = await fetch(path, {
     ...init,
     headers: {
-      ...getAuthHeaders(),
+      ...(await getAuthHeaders()),
       ...init?.headers,
     },
   });
 
   if (response.status === 401) {
-    throw new Error('Session expired. Please sign in again.');
+    throw new Error('Sign-in failed or access was denied. Sign out and sign in with Microsoft again.');
+  }
+
+  if (response.status === 403) {
+    const body = await response.text();
+    let message = 'Your account does not have permission for this action. Ask an admin to grant API scope consent.';
+    try {
+      const json = JSON.parse(body) as { error?: string };
+      if (json.error) {
+        message = json.error;
+      }
+    } catch {
+      if (body.trim()) {
+        message = body;
+      }
+    }
+    throw new Error(message);
   }
 
   if (!response.ok) {
     const body = await response.text();
+    try {
+      const json = JSON.parse(body) as { error?: string; detail?: string };
+      if (json.error) {
+        throw new Error(json.detail ? `${json.error} (${json.detail})` : json.error);
+      }
+    } catch (err) {
+      if (err instanceof Error && err.message !== body && !err.message.startsWith('Unexpected')) {
+        throw err;
+      }
+    }
     throw new Error(body || `Request failed (${response.status})`);
   }
 

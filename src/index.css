@@ -415,6 +415,17 @@ textarea {
   margin-bottom: 0.75rem;
 }
 
+.btn-microsoft {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.65rem;
+}
+
+.btn-microsoft svg {
+  flex-shrink: 0;
+}
+
 .btn-secondary {
   background: var(--surface-muted);
   color: var(--text);

@@ -65,9 +65,17 @@ interface DataTableProps {
   }>;
   rows: Array<Record<string, unknown>>;
   emptyMessage?: string;
+  onRowClick?: (row: Record<string, unknown>) => void;
+  selectedRowKey?: string | null;
 }
 
-export function DataTable({ columns, rows, emptyMessage = 'No records found.' }: DataTableProps) {
+export function DataTable({
+  columns,
+  rows,
+  emptyMessage = 'No records found.',
+  onRowClick,
+  selectedRowKey,
+}: DataTableProps) {
   if (rows.length === 0) {
     return <p className="empty-state">{emptyMessage}</p>;
   }
@@ -83,17 +91,42 @@ export function DataTable({ columns, rows, emptyMessage = 'No records found.' }:
           </tr>
         </thead>
         <tbody>
-          {rows.map((row, index) => (
-            <tr key={String(row.id ?? row.eventId ?? row.signalId ?? row.activityLogId ?? index)}>
-              {columns.map((column) => (
-                <td key={column.key}>
-                  {column.render
-                    ? column.render(row[column.key], row)
-                    : String(row[column.key] ?? '—')}
-                </td>
-              ))}
-            </tr>
-          ))}
+          {rows.map((row, index) => {
+            const rowKey = String(row.id ?? row.eventId ?? row.signalId ?? row.activityLogId ?? index);
+            const selected = selectedRowKey != null && selectedRowKey === rowKey;
+            return (
+              <tr
+                key={rowKey}
+                className={[
+                  onRowClick ? 'data-table__row--clickable' : '',
+                  selected ? 'data-table__row--selected' : '',
+                ]
+                  .filter(Boolean)
+                  .join(' ')}
+                onClick={onRowClick ? () => onRowClick(row) : undefined}
+                onKeyDown={
+                  onRowClick
+                    ? (e) => {
+                        if (e.key === 'Enter' || e.key === ' ') {
+                          e.preventDefault();
+                          onRowClick(row);
+                        }
+                      }
+                    : undefined
+                }
+                tabIndex={onRowClick ? 0 : undefined}
+                role={onRowClick ? 'button' : undefined}
+              >
+                {columns.map((column) => (
+                  <td key={column.key}>
+                    {column.render
+                      ? column.render(row[column.key], row)
+                      : String(row[column.key] ?? '—')}
+                  </td>
+                ))}
+              </tr>
+            );
+          })}
         </tbody>
       </table>
     </div>

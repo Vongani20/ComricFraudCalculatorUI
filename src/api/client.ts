@@ -154,6 +154,9 @@ export const api = {
   getFraudSignal: (idHash: string) =>
     request<import('@/types/api').FraudSignal>(`/api/v1/fraud-signals/${idHash}`),
 
+  getFraudSignalDetail: (signalId: string) =>
+    request<import('@/types/api').FraudSignalDetail>(`/api/v1/fraud-signals/detail/${signalId}`),
+
   listHrEvents: (page = 1, pageSize = 20) =>
     request<import('@/types/api').HrEvent[]>(
       `/api/v1/hr-events?page=${page}&pageSize=${pageSize}`,

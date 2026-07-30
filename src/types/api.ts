@@ -76,6 +76,32 @@ export interface FraudSignal {
   isActive: boolean;
 }
 
+export interface FraudSignalCategoryBreakdown {
+  signalCategory: SignalCategory;
+  occurrenceCount: number;
+  signalCount: number;
+  maxRiskScore: number;
+}
+
+export interface FraudSignalTimelinePoint {
+  occurredAt: string;
+  occurrenceIndex: number;
+  estimatedRiskScore: number;
+  label: string;
+}
+
+export interface FraudSignalRiskTrendPoint {
+  at: string;
+  aggregateRiskScore: number;
+}
+
+export interface FraudSignalDetail {
+  signal: FraudSignal;
+  categoryBreakdown: FraudSignalCategoryBreakdown[];
+  occurrenceTimeline: FraudSignalTimelinePoint[];
+  aggregateRiskTrend: FraudSignalRiskTrendPoint[];
+}
+
 export interface FraudSignalList {
   signals: FraudSignal[];
   totalCount: number;

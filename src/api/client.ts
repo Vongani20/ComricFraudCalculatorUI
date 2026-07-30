@@ -189,6 +189,27 @@ export const api = {
       method: 'POST',
       body: JSON.stringify({ idNumber }),
     }),
+
+  getCurrentUser: () => request<import('@/types/api').CurrentUser>('/api/v1/users/me'),
+
+  listUsers: () => request<import('@/types/api').TenantUserList>('/api/v1/users'),
+
+  upsertUser: (payload: import('@/types/api').UpsertTenantUserRequest) =>
+    request<import('@/types/api').TenantUser>('/api/v1/users', {
+      method: 'POST',
+      body: JSON.stringify(payload),
+    }),
+
+  updateUser: (tenantUserId: string, payload: import('@/types/api').UpdateTenantUserRequest) =>
+    request<import('@/types/api').TenantUser>(`/api/v1/users/${tenantUserId}`, {
+      method: 'PUT',
+      body: JSON.stringify(payload),
+    }),
+
+  deactivateUser: (tenantUserId: string) =>
+    request<void>(`/api/v1/users/${tenantUserId}`, {
+      method: 'DELETE',
+    }),
 };
 
 export const tenants = [

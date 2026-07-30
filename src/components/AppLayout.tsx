@@ -11,32 +11,49 @@ import {
   Settings,
   Shield,
   Smartphone,
+  UserCog,
   UserSearch,
   Users,
 } from 'lucide-react';
 import { useAuth } from '@/auth/AuthProvider';
+import { useCurrentUser } from '@/auth/CurrentUserProvider';
 import { getSelectedTenant, getSelectedTenantId, setSelectedTenantId, tenants } from '@/api/client';
 import { resolveSearchQuery } from '@/utils/search';
 
 const navItems = [
-  { to: '/', label: 'Dashboard', icon: LayoutDashboard, end: true },
-  { to: '/fraud-signals', label: 'Fraud Signals', icon: Radio },
-  { to: '/hr-events', label: 'Submit HR Event', icon: Users },
-  { to: '/mno-events', label: 'MNO Events', icon: Smartphone },
-  { to: '/id-lookup', label: 'ID Lookup', icon: UserSearch },
-  { to: '/activity-log', label: 'Activity Log', icon: Activity },
+  { to: '/', label: 'Dashboard', icon: LayoutDashboard, end: true, permission: 'ViewDashboard' },
+  { to: '/fraud-signals', label: 'Fraud Signals', icon: Radio, permission: 'ViewSignals' },
+  { to: '/hr-events', label: 'Submit HR Event', icon: Users, permission: 'SubmitEvents' },
+  { to: '/mno-events', label: 'MNO Events', icon: Smartphone, permission: 'SubmitEvents' },
+  { to: '/id-lookup', label: 'ID Lookup', icon: UserSearch, permission: 'ViewSignals' },
+  { to: '/activity-log', label: 'Activity Log', icon: Activity, permission: 'ViewAudit' },
+  { to: '/users', label: 'Users', icon: UserCog, permission: 'ManageUsers' },
 ];
 
 interface AppLayoutProps {
   children: ReactNode;
 }
 
+function initialsFrom(nameOrEmail: string | null | undefined): string {
+  if (!nameOrEmail) return '??';
+  const base = nameOrEmail.includes('@') ? nameOrEmail.split('@')[0] : nameOrEmail;
+  const parts = base.split(/[.\s_-]+/).filter(Boolean);
+  if (parts.length >= 2) return (parts[0][0] + parts[1][0]).toUpperCase();
+  return base.slice(0, 2).toUpperCase();
+}
+
 export function AppLayout({ children }: AppLayoutProps) {
   const navigate = useNavigate();
-  const { logout } = useAuth();
+  const { logout, accountName } = useAuth();
+  const { currentUser, can } = useCurrentUser();
   const [tenantId, setTenantId] = useState(getSelectedTenantId());
   const [search, setSearch] = useState('');
   const tenant = getSelectedTenant();
+
+  const displayName =
+    currentUser?.displayName || accountName || currentUser?.email || tenant.user.name;
+  const displayRole = currentUser?.roleDisplayName || tenant.user.role;
+  const avatar = initialsFrom(displayName);
 
   const handleTenantChange = (value: string) => {
     setSelectedTenantId(value);
@@ -54,6 +71,8 @@ export function AppLayout({ children }: AppLayoutProps) {
     navigate(path);
   };
 
+  const visibleNav = navItems.filter((item) => can(item.permission));
+
   return (
     <div className={`app-shell app-shell--${tenant.theme}`}>
       <aside className="sidebar">
@@ -68,7 +87,7 @@ export function AppLayout({ children }: AppLayoutProps) {
         </div>
 
         <nav className="sidebar-nav">
-          {navItems.map((item) => {
+          {visibleNav.map((item) => {
             const Icon = item.icon;
             return (
               <NavLink
@@ -96,22 +115,16 @@ export function AppLayout({ children }: AppLayoutProps) {
           </select>
           <div className="tenant-user-card">
             <div className={`tenant-user-card__avatar tenant-user-card__avatar--${tenant.theme}`}>
-              {tenant.user.initials}
+              {avatar}
             </div>
             <div>
-              <strong>{tenant.user.name}</strong>
-              <span>{tenant.user.role}</span>
-              {'department' in tenant.user ? (
+              <strong>{displayName}</strong>
+              <span>{displayRole}</span>
+              {currentUser?.email ? (
                 <ul className="tenant-user-card__meta">
-                  <li>Dept: {tenant.user.department}</li>
-                  <li>ID: {tenant.user.employeeId}</li>
+                  <li>{currentUser.email}</li>
                 </ul>
-              ) : (
-                <ul className="tenant-user-card__meta">
-                  <li>Region: {tenant.user.region}</li>
-                  <li>Squad: {tenant.user.squad}</li>
-                </ul>
-              )}
+              ) : null}
             </div>
           </div>
         </div>
@@ -142,12 +155,10 @@ export function AppLayout({ children }: AppLayoutProps) {
               <Settings size={18} />
             </button>
             <div className="user-chip">
-              <div className={`user-chip__avatar user-chip__avatar--${tenant.theme}`}>
-                {tenant.user.initials}
-              </div>
+              <div className={`user-chip__avatar user-chip__avatar--${tenant.theme}`}>{avatar}</div>
               <div className="user-chip__meta">
-                <span className="user-chip__name">{tenant.user.name}</span>
-                <span className="user-chip__role">{tenant.user.role}</span>
+                <span className="user-chip__name">{displayName}</span>
+                <span className="user-chip__role">{displayRole}</span>
               </div>
             </div>
             <button

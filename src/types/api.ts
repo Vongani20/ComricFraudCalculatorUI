@@ -179,3 +179,43 @@ export interface SubmitMnoEventRequest {
   deviceImei?: string;
   flagReason?: string;
 }
+
+export type TenantUserRole = 'TenantAdmin' | 'Analyst' | 'Viewer';
+
+export interface CurrentUser {
+  email: string;
+  displayName: string | null;
+  role: TenantUserRole | null;
+  roleDisplayName: string | null;
+  tenantId: string;
+  hasAccess: boolean;
+  permissions: string[];
+}
+
+export interface TenantUser {
+  tenantUserId: string;
+  tenantId: string;
+  email: string;
+  displayName: string | null;
+  role: TenantUserRole;
+  roleDisplayName: string;
+  isActive: boolean;
+  createdAt: string;
+  updatedAt: string | null;
+}
+
+export interface TenantUserList {
+  users: TenantUser[];
+}
+
+export interface UpsertTenantUserRequest {
+  email: string;
+  displayName?: string;
+  role: TenantUserRole;
+}
+
+export interface UpdateTenantUserRequest {
+  role: TenantUserRole;
+  displayName?: string;
+  isActive?: boolean;
+}

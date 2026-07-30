@@ -118,11 +118,11 @@ export function AppLayout({ children }: AppLayoutProps) {
               {avatar}
             </div>
             <div>
-              <strong>{displayName}</strong>
-              <span>{displayRole}</span>
+              <strong title={displayName}>{displayName}</strong>
+              <span title={displayRole}>{displayRole}</span>
               {currentUser?.email ? (
                 <ul className="tenant-user-card__meta">
-                  <li>{currentUser.email}</li>
+                  <li title={currentUser.email}>{currentUser.email}</li>
                 </ul>
               ) : null}
             </div>

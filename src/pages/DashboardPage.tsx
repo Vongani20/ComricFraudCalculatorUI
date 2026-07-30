@@ -155,7 +155,11 @@ export function DashboardPage() {
           rows={overview.recentSubmissions as unknown as Array<Record<string, unknown>>}
           columns={[
             { key: 'source', label: 'Source' },
-            { key: 'idNumber', label: 'ID Number' },
+            {
+              key: 'idNumber',
+              label: 'ID Hash',
+              render: (value) => <code>{truncateHash(String(value), 16)}</code>,
+            },
             {
               key: 'eventType',
               label: 'Event type',

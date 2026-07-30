@@ -2,7 +2,7 @@ import { useEffect, useState, type FormEvent } from 'react';
 import { api } from '@/api/client';
 import type { HrEvent, HrEventType, SubmitHrEventRequest, VerificationStatus } from '@/types/api';
 import { DataTable, DateCell, ErrorState, LoadingState, PageHeader, Panel, RiskBadge, StatusPill } from '@/components/ui';
-import { formatLabel } from '@/utils/format';
+import { formatLabel, truncateHash } from '@/utils/format';
 import { validateSaIdNumber } from '@/utils/validateSaId';
 const eventTypes: HrEventType[] = [
   'EmployeeVerification',
@@ -187,7 +187,11 @@ export function HrEventsPage() {
         <DataTable
           rows={events as unknown as Array<Record<string, unknown>>}
           columns={[
-            { key: 'idNumber', label: 'ID Number' },
+            {
+              key: 'idNumber',
+              label: 'ID Hash',
+              render: (value) => <code>{truncateHash(String(value), 16)}</code>,
+            },
             {
               key: 'eventType',
               label: 'Type',

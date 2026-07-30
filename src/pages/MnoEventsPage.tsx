@@ -7,7 +7,7 @@ import type {
   SubmitMnoEventRequest,
 } from '@/types/api';
 import { DataTable, DateCell, ErrorState, LoadingState, PageHeader, Panel, RiskBadge } from '@/components/ui';
-import { formatLabel } from '@/utils/format';
+import { formatLabel, truncateHash } from '@/utils/format';
 import { validateSaIdNumber } from '@/utils/validateSaId';
 
 const eventTypes: MnoEventType[] = [
@@ -208,7 +208,11 @@ export function MnoEventsPage() {
           <DataTable
           rows={events as unknown as Array<Record<string, unknown>>}
           columns={[
-            { key: 'idNumber', label: 'ID Number' },
+            {
+              key: 'idNumber',
+              label: 'ID Hash',
+              render: (value) => <code>{truncateHash(String(value), 16)}</code>,
+            },
             { key: 'msisdn', label: 'MSISDN' },
             {
               key: 'eventType',

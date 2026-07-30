@@ -8,6 +8,7 @@ import type {
 } from '@/types/api';
 import { DataTable, DateCell, ErrorState, LoadingState, PageHeader, Panel, RiskBadge } from '@/components/ui';
 import { formatLabel } from '@/utils/format';
+import { validateSaIdNumber } from '@/utils/validateSaId';
 
 const eventTypes: MnoEventType[] = [
   'NewSIMApplication',
@@ -40,6 +41,7 @@ export function MnoEventsPage() {
   const [events, setEvents] = useState<MnoEvent[]>([]);
   const [form, setForm] = useState<SubmitMnoEventRequest>(emptyForm);
   const [error, setError] = useState<string | null>(null);
+  const [idError, setIdError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
 
@@ -60,6 +62,14 @@ export function MnoEventsPage() {
     event.preventDefault();
     setSubmitting(true);
     setError(null);
+
+    const idValidation = validateSaIdNumber(form.idNumber);
+    if (!idValidation.valid) {
+      setIdError(idValidation.message ?? 'ID number must be exactly 13 digits.');
+      setSubmitting(false);
+      return;
+    }
+    setIdError(null);
 
     try {
       await api.submitMnoEvent({
@@ -92,10 +102,26 @@ export function MnoEventsPage() {
             ID Number
             <input
               required
-              maxLength={20}
+              maxLength={13}
+              inputMode="numeric"
+              pattern="\d{13}"
+              placeholder="13-digit SA ID"
               value={form.idNumber}
-              onChange={(e) => setForm({ ...form, idNumber: e.target.value })}
+              onChange={(e) => {
+                setForm({ ...form, idNumber: e.target.value.replace(/\D/g, '').slice(0, 13) });
+                setIdError(null);
+              }}
+              onBlur={() => {
+                if (form.idNumber.length === 13) {
+                  const result = validateSaIdNumber(form.idNumber);
+                  setIdError(result.valid ? null : result.message ?? 'Invalid ID number');
+                } else if (form.idNumber.length > 0) {
+                  setIdError('ID number must be exactly 13 digits.');
+                }
+              }}
+              aria-invalid={Boolean(idError)}
             />
+            {idError ? <span className="field-error">{idError}</span> : null}
           </label>
           <label>
             MSISDN

@@ -4,6 +4,7 @@ import { api } from '@/api/client';
 import type { IdCheckResult } from '@/types/api';
 import { DataTable, ErrorState, PageHeader, Panel, RiskBadge } from '@/components/ui';
 import { formatLabel, truncateHash } from '@/utils/format';
+import { validateSaIdNumber } from '@/utils/validateSaId';
 
 async function runIdCheck(
   idNumber: string,
@@ -32,18 +33,31 @@ export function IdLookupPage() {
   const [idNumber, setIdNumber] = useState(searchParams.get('id') ?? '');
   const [result, setResult] = useState<IdCheckResult | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [idError, setIdError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     const idFromUrl = searchParams.get('id');
     if (!idFromUrl) return;
 
-    setIdNumber(idFromUrl);
-    void runIdCheck(idFromUrl, { setResult, setError, setLoading });
+    setIdNumber(idFromUrl.replace(/\D/g, '').slice(0, 13));
+    const idValidation = validateSaIdNumber(idFromUrl);
+    if (!idValidation.valid) {
+      setIdError(idValidation.message ?? 'ID number must be exactly 13 digits.');
+      return;
+    }
+    setIdError(null);
+    void runIdCheck(idFromUrl.replace(/\D/g, '').slice(0, 13), { setResult, setError, setLoading });
   }, [searchParams]);
 
   const handleCheck = async (event: FormEvent) => {
     event.preventDefault();
+    const idValidation = validateSaIdNumber(idNumber);
+    if (!idValidation.valid) {
+      setIdError(idValidation.message ?? 'ID number must be exactly 13 digits.');
+      return;
+    }
+    setIdError(null);
     await runIdCheck(idNumber, { setResult, setError, setLoading });
   };
 
@@ -61,11 +75,26 @@ export function IdLookupPage() {
             ID Number
             <input
               required
-              maxLength={20}
-              placeholder="e.g. 8501015800084"
+              maxLength={13}
+              inputMode="numeric"
+              pattern="\d{13}"
+              placeholder="13-digit SA ID"
               value={idNumber}
-              onChange={(e) => setIdNumber(e.target.value)}
+              onChange={(e) => {
+                setIdNumber(e.target.value.replace(/\D/g, '').slice(0, 13));
+                setIdError(null);
+              }}
+              onBlur={() => {
+                if (idNumber.length === 13) {
+                  const result = validateSaIdNumber(idNumber);
+                  setIdError(result.valid ? null : result.message ?? 'Invalid ID number');
+                } else if (idNumber.length > 0) {
+                  setIdError('ID number must be exactly 13 digits.');
+                }
+              }}
+              aria-invalid={Boolean(idError)}
             />
+            {idError ? <span className="field-error">{idError}</span> : null}
           </label>
           <button type="submit" className="btn-primary" disabled={loading}>
             {loading ? 'Checking…' : 'Check ID'}

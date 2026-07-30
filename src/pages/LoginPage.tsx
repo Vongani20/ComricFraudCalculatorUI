@@ -50,45 +50,49 @@ export function LoginPage() {
 
   return (
     <div className="login-page">
+      <div className="login-page__glow" aria-hidden />
       <div className="login-card">
         <div className="login-card__brand">
-          <div className="brand__icon">
-            <Shield size={24} />
+          <div className="login-card__icon">
+            <Shield size={26} strokeWidth={2.2} />
           </div>
-          <div>
-            <strong>Comric Fraud Calculator</strong>
-            <span>Portal sign-in</span>
+          <div className="login-card__brand-text">
+            <strong className="login-card__product">Comric Fraud Calculator</strong>
+            <span className="login-card__subtitle">Portal sign-in</span>
           </div>
         </div>
 
-        <h1>Sign in</h1>
-        <p>Use your work account on the Microsoft login page.</p>
+        <div className="login-card__body">
+          <h1>Sign in</h1>
+          <p>Use your work account on the Microsoft login page to continue.</p>
 
-        {isEntraConfigured ? (
-          <button
-            type="button"
-            className="btn-primary btn-primary--full btn-microsoft"
-            disabled={signingIn}
-            onClick={() => void handleMicrosoftLogin()}
-          >
-            <MicrosoftLogo />
-            <span>{signingIn ? 'Redirecting…' : 'Sign in with Microsoft'}</span>
-          </button>
-        ) : null}
+          {isEntraConfigured ? (
+            <button
+              type="button"
+              className="btn-primary btn-primary--full btn-microsoft"
+              disabled={signingIn}
+              onClick={() => void handleMicrosoftLogin()}
+            >
+              <MicrosoftLogo />
+              <span>{signingIn ? 'Redirecting…' : 'Sign in with Microsoft'}</span>
+            </button>
+          ) : null}
 
-        {canUseDevLogin() ? (
-          <button type="button" className="btn-secondary btn-primary--full" onClick={() => loginWithDev()}>
-            Continue with Dev Account
-          </button>
-        ) : null}
+          {canUseDevLogin() ? (
+            <button type="button" className="btn-secondary btn-primary--full" onClick={() => loginWithDev()}>
+              Continue with Dev Account
+            </button>
+          ) : null}
 
-        {!isEntraConfigured && !canUseDevLogin() ? (
-          <p className="error-state">
-            Microsoft sign-in is not configured. Set VITE_AZURE_TENANT_ID, VITE_AZURE_CLIENT_ID, and VITE_AZURE_API_SCOPE.
-          </p>
-        ) : null}
+          {!isEntraConfigured && !canUseDevLogin() ? (
+            <p className="error-state">
+              Microsoft sign-in is not configured. Set VITE_AZURE_TENANT_ID, VITE_AZURE_CLIENT_ID, and
+              VITE_AZURE_API_SCOPE.
+            </p>
+          ) : null}
 
-        {error ? <p className="error-state">{error}</p> : null}
+          {error ? <p className="error-state">{error}</p> : null}
+        </div>
       </div>
     </div>
   );

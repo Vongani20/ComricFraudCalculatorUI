@@ -81,7 +81,7 @@ export function MnoEventsPage() {
       setForm(emptyForm);
       loadEvents();
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to submit MNO event');
+      setError(err instanceof Error ? err.message : 'Failed to submit NO event');
     } finally {
       setSubmitting(false);
     }
@@ -90,13 +90,13 @@ export function MnoEventsPage() {
   return (
     <section>
       <PageHeader
-        title="MNO Events"
+        title="NO Events"
         description="Telecom channel events including SIM applications, port requests, and swaps."
-        breadcrumb="MNO Events"
+        breadcrumb="NO Events"
       />
 
       <form className="form-card" onSubmit={handleSubmit}>
-        <h2>Submit MNO Event</h2>
+        <h2>Submit NO Event</h2>
         <div className="form-grid">
           <label>
             ID Number
@@ -204,7 +204,7 @@ export function MnoEventsPage() {
       {error ? <ErrorState message={error} /> : null}
 
       {!loading ? (
-        <Panel title="Recent MNO events" subtitle="SIM, port, and RICA channel activity">
+        <Panel title="Recent NO events" subtitle="SIM, port, and RICA channel activity">
           <DataTable
           rows={events as unknown as Array<Record<string, unknown>>}
           columns={[

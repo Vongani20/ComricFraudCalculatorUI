@@ -106,7 +106,7 @@ export const api = {
 
       const recentMno = mnoEvents.map((event) => ({
         eventId: event.eventId,
-        source: 'MNO',
+        source: 'NO',
         idNumber: event.idNumber,
         eventType: event.eventType,
         riskScore: event.riskScore,

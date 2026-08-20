@@ -2,7 +2,7 @@ const routeMatchers = [
   { path: '/', terms: ['dashboard', 'overview', 'home'] },
   { path: '/fraud-signals', terms: ['fraud', 'signal', 'signals'] },
   { path: '/hr-events', terms: ['hr', 'employment', 'ghost', 'payroll'] },
-  { path: '/mno-events', terms: ['mno', 'sim', 'telecom', 'msisdn', 'port'] },
+  { path: '/mno-events', terms: ['no', 'mno', 'sim', 'telecom', 'msisdn', 'port'] },
   { path: '/id-lookup', terms: ['lookup', 'id', 'identity', 'check'] },
   { path: '/activity-log', terms: ['activity', 'audit', 'log', 'api'] },
 ] as const;

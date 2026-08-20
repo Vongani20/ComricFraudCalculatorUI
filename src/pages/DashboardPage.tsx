@@ -71,7 +71,7 @@ export function DashboardPage() {
         <StatCard
           label="Total events submitted"
           value={stats.totalEventsSubmitted}
-          hint={`HR ${stats.totalHrEvents} · MNO ${stats.totalMnoEvents}`}
+          hint={`HR ${stats.totalHrEvents} · NO ${stats.totalMnoEvents}`}
           percent={(stats.totalEventsSubmitted / maxMetric) * 100}
           color="#4ec5a8"
         />
@@ -97,7 +97,7 @@ export function DashboardPage() {
       </div>
 
       <div className="dashboard-grid">
-        <Panel title="Activity chart" subtitle="Event submission volume over the last 30 days (HR vs MNO)">
+        <Panel title="Activity chart" subtitle="Event submission volume over the last 30 days (HR vs NO)">
           <div className="chart-wrap">
             <ResponsiveContainer width="100%" height="100%">
               <AreaChart data={chartData} margin={{ top: 8, right: 8, left: -18, bottom: 0 }}>
@@ -117,7 +117,7 @@ export function DashboardPage() {
                 <Tooltip />
                 <Legend />
                 <Area type="monotone" dataKey="hr" name="HR" stroke="#4ec5a8" fill="url(#hrFill)" strokeWidth={2} />
-                <Area type="monotone" dataKey="mno" name="MNO" stroke="#60a5fa" fill="url(#mnoFill)" strokeWidth={2} />
+                <Area type="monotone" dataKey="mno" name="NO" stroke="#60a5fa" fill="url(#mnoFill)" strokeWidth={2} />
               </AreaChart>
             </ResponsiveContainer>
           </div>
@@ -149,7 +149,7 @@ export function DashboardPage() {
         </Panel>
       </div>
 
-      <Panel title="Recent submissions" subtitle="Latest HR and MNO event submissions for this tenant">
+      <Panel title="Recent submissions" subtitle="Latest HR and NO event submissions for this tenant">
         <DataTable
           emptyMessage="No submissions yet."
           rows={overview.recentSubmissions as unknown as Array<Record<string, unknown>>}

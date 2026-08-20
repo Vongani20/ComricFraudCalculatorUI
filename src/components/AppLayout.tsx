@@ -24,7 +24,7 @@ const navItems = [
   { to: '/', label: 'Dashboard', icon: LayoutDashboard, end: true, permission: 'ViewDashboard' },
   { to: '/fraud-signals', label: 'Fraud Signals', icon: Radio, permission: 'ViewSignals' },
   { to: '/hr-events', label: 'Submit HR Event', icon: Users, permission: 'SubmitEvents' },
-  { to: '/mno-events', label: 'MNO Events', icon: Smartphone, permission: 'SubmitEvents' },
+  { to: '/mno-events', label: 'NO Events', icon: Smartphone, permission: 'SubmitEvents' },
   { to: '/id-lookup', label: 'ID Lookup', icon: UserSearch, permission: 'ViewSignals' },
   { to: '/activity-log', label: 'Activity Log', icon: Activity, permission: 'ViewAudit' },
   { to: '/users', label: 'Users', icon: UserCog, permission: 'ManageUsers' },

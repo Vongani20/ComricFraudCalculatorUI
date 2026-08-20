@@ -12,6 +12,7 @@ export function formatLabel(value: string): string {
   return value
     .replace(/_/g, ' ')
     .replace(/([a-z])([A-Z])/g, '$1 $2')
+    .replace(/\bMNO\b/g, 'NO')
     .trim();
 }
 

@@ -15,7 +15,7 @@ React frontend for the Comric Fraud Calculator backend API.
 | Dashboard | `GET /api/v1/dashboard/stats` |
 | Fraud Signals | `GET /api/v1/fraud-signals` |
 | HR Events | `GET/POST /api/v1/hr-events` |
-| MNO Events | `GET/POST /api/v1/mno-events` |
+| NO Events | `GET/POST /api/v1/mno-events` |
 | ID Lookup | `POST /api/v1/lookup/id-check` |
 | Activity Log | `GET /api/v1/activity-log` |
 

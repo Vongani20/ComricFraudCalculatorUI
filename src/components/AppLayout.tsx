@@ -105,7 +105,7 @@ export function AppLayout({ children }: AppLayoutProps) {
 
         <div className="promo-card">
           <h3>Tenant workspace</h3>
-          <p>Switch between MNO tenants to view isolated fraud signals and events.</p>
+          <p>Switch between NO tenants to view isolated fraud signals and events.</p>
           <select value={tenantId} onChange={(e) => handleTenantChange(e.target.value)}>
             {tenants.map((t) => (
               <option key={t.id} value={t.id}>

@@ -6,7 +6,6 @@ import { formatLabel, truncateHash } from '@/utils/format';
 import { validateSaIdNumber } from '@/utils/validateSaId';
 const eventTypes: HrEventType[] = [
   'EmployeeVerification',
-  'GhostEmployee',
   'PayrollMismatch',
   'IdentityFraud',
 ];
@@ -20,7 +19,7 @@ const verificationStatuses: VerificationStatus[] = [
 
 const emptyForm: SubmitHrEventRequest = {
   idNumber: '',
-  eventType: 'GhostEmployee',
+  eventType: 'EmployeeVerification',
   eventDate: new Date().toISOString().slice(0, 16),
   employerName: '',
   employeeNumber: '',

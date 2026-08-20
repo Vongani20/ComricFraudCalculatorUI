@@ -239,6 +239,39 @@ export const tenants = [
       squad: 'SIM Integrity',
     },
   },
+  {
+    id: '33333333-3333-3333-3333-333333333333',
+    name: 'CELL C',
+    code: 'CELLC',
+    theme: 'cellc',
+    user: {
+      initials: 'TM',
+      name: 'Thabo Molefe',
+      role: 'Fraud Analyst',
+    },
+  },
+  {
+    id: '44444444-4444-4444-4444-444444444444',
+    name: 'TELKOM',
+    code: 'TEL',
+    theme: 'telkom',
+    user: {
+      initials: 'LN',
+      name: 'Lerato Ndlovu',
+      role: 'Fraud Analyst',
+    },
+  },
+  {
+    id: '55555555-5555-5555-5555-555555555555',
+    name: 'LIQUID',
+    code: 'LIQ',
+    theme: 'liquid',
+    user: {
+      initials: 'SM',
+      name: 'Sipho Mokoena',
+      role: 'Fraud Analyst',
+    },
+  },
 ] as const;
 
 export type TenantConfig = (typeof tenants)[number];

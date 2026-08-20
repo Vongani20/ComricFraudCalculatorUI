@@ -236,6 +236,18 @@ textarea {
   background: linear-gradient(135deg, #fbbf24, #f59e0b);
 }
 
+.tenant-user-card__avatar--cellc {
+  background: linear-gradient(135deg, #00a3e0, #0077a8);
+}
+
+.tenant-user-card__avatar--telkom {
+  background: linear-gradient(135deg, #00a651, #007a3d);
+}
+
+.tenant-user-card__avatar--liquid {
+  background: linear-gradient(135deg, #6b2d8b, #4a1f61);
+}
+
 .tenant-user-card__meta {
   margin: 0.35rem 0 0;
   padding: 0;
@@ -388,6 +400,18 @@ textarea {
   background: linear-gradient(135deg, #fbbf24, #f59e0b);
 }
 
+.user-chip__avatar--cellc {
+  background: linear-gradient(135deg, #00a3e0, #0077a8);
+}
+
+.user-chip__avatar--telkom {
+  background: linear-gradient(135deg, #00a651, #007a3d);
+}
+
+.user-chip__avatar--liquid {
+  background: linear-gradient(135deg, #6b2d8b, #4a1f61);
+}
+
 .app-shell--vodacom {
   --primary: #4ec5a8;
   --primary-dark: #3aab8f;
@@ -400,11 +424,42 @@ textarea {
   --primary-soft: #fff7e8;
 }
 
+.app-shell--cellc {
+  --primary: #00a3e0;
+  --primary-dark: #0077a8;
+  --primary-soft: #e6f6fc;
+}
+
+.app-shell--telkom {
+  --primary: #00a651;
+  --primary-dark: #007a3d;
+  --primary-soft: #e6f7ee;
+}
+
+.app-shell--liquid {
+  --primary: #6b2d8b;
+  --primary-dark: #4a1f61;
+  --primary-soft: #f3eaf7;
+}
+
 .app-shell--mtn .nav-link--active {
   color: #b45309;
 }
 
 .app-shell--mtn .brand__icon {
+  background: var(--primary-soft);
+  color: var(--primary-dark);
+}
+
+.app-shell--cellc .nav-link--active,
+.app-shell--telkom .nav-link--active,
+.app-shell--liquid .nav-link--active {
+  color: var(--primary-dark);
+}
+
+.app-shell--cellc .brand__icon,
+.app-shell--telkom .brand__icon,
+.app-shell--liquid .brand__icon {
   background: var(--primary-soft);
   color: var(--primary-dark);
 }

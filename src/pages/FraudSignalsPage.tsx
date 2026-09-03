@@ -1,8 +1,14 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { api } from '@/api/client';
 import type { FraudSignal, FraudSignalDetail } from '@/types/api';
 import { DataTable, DateCell, ErrorState, LoadingState, PageHeader, Panel, RiskBadge } from '@/components/ui';
-import { formatDate, formatLabel, truncateHash } from '@/utils/format';
+import { formatDate, formatLabel, riskLevel, truncateHash } from '@/utils/format';
+
+type RiskFilter = 'all' | 'low' | 'medium' | 'high' | 'critical';
+
+function toDateKey(value: string): string {
+  return value.slice(0, 10);
+}
 
 export function FraudSignalsPage() {
   const [signals, setSignals] = useState<FraudSignal[]>([]);
@@ -12,14 +18,35 @@ export function FraudSignalsPage() {
   const [detail, setDetail] = useState<FraudSignalDetail | null>(null);
   const [detailLoading, setDetailLoading] = useState(false);
   const [detailError, setDetailError] = useState<string | null>(null);
+  const [dateFrom, setDateFrom] = useState('');
+  const [dateTo, setDateTo] = useState('');
+  const [riskFilter, setRiskFilter] = useState<RiskFilter>('all');
 
   useEffect(() => {
     api
-      .listFraudSignals()
+      .listFraudSignals(1, 100)
       .then((result) => setSignals(result.signals))
       .catch((err: Error) => setError(err.message))
       .finally(() => setLoading(false));
   }, []);
+
+  const filteredSignals = useMemo(() => {
+    return signals.filter((signal) => {
+      const lastSeenDay = toDateKey(signal.lastSeen);
+      if (dateFrom && lastSeenDay < dateFrom) return false;
+      if (dateTo && lastSeenDay > dateTo) return false;
+      if (riskFilter !== 'all' && riskLevel(signal.aggregateRiskScore) !== riskFilter) return false;
+      return true;
+    });
+  }, [signals, dateFrom, dateTo, riskFilter]);
+
+  const filtersActive = Boolean(dateFrom || dateTo || riskFilter !== 'all');
+
+  const clearFilters = () => {
+    setDateFrom('');
+    setDateTo('');
+    setRiskFilter('all');
+  };
 
   const openDetail = async (signalId: string) => {
     setSelectedId(signalId);
@@ -67,14 +94,59 @@ export function FraudSignalsPage() {
           title="Active signals"
           subtitle="Click a row for occurrence timeline, category breakdown, and risk trend"
         >
+          <div className="table-filters" role="search" aria-label="Filter signals by date and risk">
+            <label>
+              From
+              <input
+                type="date"
+                value={dateFrom}
+                max={dateTo || undefined}
+                onChange={(e) => setDateFrom(e.target.value)}
+              />
+            </label>
+            <label>
+              To
+              <input
+                type="date"
+                value={dateTo}
+                min={dateFrom || undefined}
+                onChange={(e) => setDateTo(e.target.value)}
+              />
+            </label>
+            <label>
+              Risk
+              <select
+                value={riskFilter}
+                onChange={(e) => setRiskFilter(e.target.value as RiskFilter)}
+              >
+                <option value="all">All levels</option>
+                <option value="critical">Critical (80+)</option>
+                <option value="high">High (60–79)</option>
+                <option value="medium">Medium (40–59)</option>
+                <option value="low">Low (0–39)</option>
+              </select>
+            </label>
+            <div className="table-filters__actions">
+              <span className="table-filters__count">
+                {filteredSignals.length} of {signals.length}
+              </span>
+              {filtersActive ? (
+                <button type="button" className="btn-secondary btn-secondary--compact" onClick={clearFilters}>
+                  Clear
+                </button>
+              ) : null}
+            </div>
+          </div>
           <DataTable
-            emptyMessage="No active fraud signals yet."
+            emptyMessage={
+              filtersActive ? 'No signals match the selected date and risk filters.' : 'No active fraud signals yet.'
+            }
             selectedRowKey={selectedId}
             onRowClick={(row) => {
               const id = String(row.signalId ?? '');
               if (id) void openDetail(id);
             }}
-            rows={signals as unknown as Array<Record<string, unknown>>}
+            rows={filteredSignals as unknown as Array<Record<string, unknown>>}
             columns={[
               {
                 key: 'idNumberHash',

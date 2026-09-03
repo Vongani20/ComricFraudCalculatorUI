@@ -19,6 +19,7 @@ import { useAuth } from '@/auth/AuthProvider';
 import { useCurrentUser } from '@/auth/CurrentUserProvider';
 import { getSelectedTenant, getSelectedTenantId, setSelectedTenantId, tenants } from '@/api/client';
 import { resolveSearchQuery } from '@/utils/search';
+import { formatEmailLocalPart } from '@/utils/format';
 
 const navItems = [
   { to: '/', label: 'Dashboard', icon: LayoutDashboard, end: true, permission: 'ViewDashboard' },
@@ -51,7 +52,10 @@ export function AppLayout({ children }: AppLayoutProps) {
   const tenant = getSelectedTenant();
 
   const displayName =
-    currentUser?.displayName || accountName || currentUser?.email || tenant.user.name;
+    currentUser?.displayName ||
+    (accountName ? formatEmailLocalPart(accountName) : null) ||
+    formatEmailLocalPart(currentUser?.email) ||
+    tenant.user.name;
   const displayRole = currentUser?.roleDisplayName || tenant.user.role;
   const avatar = initialsFrom(displayName);
 
@@ -120,11 +124,6 @@ export function AppLayout({ children }: AppLayoutProps) {
             <div>
               <strong title={displayName}>{displayName}</strong>
               <span title={displayRole}>{displayRole}</span>
-              {currentUser?.email ? (
-                <ul className="tenant-user-card__meta">
-                  <li title={currentUser.email}>{currentUser.email}</li>
-                </ul>
-              ) : null}
             </div>
           </div>
         </div>

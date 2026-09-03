@@ -32,5 +32,5 @@ export function isAllowedOrganizationAccount(account: AccountInfo): boolean {
 }
 
 export function organizationAccessDeniedMessage(): string {
-  return `Only @${ALLOWED_EMAIL_DOMAIN} accounts can sign in.`;
+  return 'Only organization work accounts can sign in.';
 }

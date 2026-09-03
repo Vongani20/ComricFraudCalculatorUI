@@ -3,6 +3,7 @@ import { api } from '@/api/client';
 import type { TenantUser, TenantUserRole } from '@/types/api';
 import { DataTable, DateCell, ErrorState, LoadingState, PageHeader, Panel } from '@/components/ui';
 import { useCurrentUser } from '@/auth/CurrentUserProvider';
+import { formatEmailLocalPart } from '@/utils/format';
 
 const roles: TenantUserRole[] = ['TenantAdmin', 'Analyst', 'Viewer'];
 
@@ -81,7 +82,8 @@ export function UsersPage() {
   };
 
   const handleDeactivate = async (user: TenantUser) => {
-    if (!window.confirm(`Deactivate access for ${user.email}?`)) return;
+    const label = user.displayName || formatEmailLocalPart(user.email) || 'this user';
+    if (!window.confirm(`Deactivate access for ${label}?`)) return;
     setError(null);
     try {
       await api.deactivateUser(user.tenantUserId);
@@ -108,7 +110,7 @@ export function UsersPage() {
       <form className="form-card" onSubmit={handleSubmit}>
         <h2>Add or update user</h2>
         <p className="form-help">
-          Enter a Solugrowth work email and choose a role. Existing users are updated in place.
+          Enter a work email and choose a role. Existing users are updated in place.
         </p>
         <div className="form-grid">
           <label>
@@ -116,7 +118,7 @@ export function UsersPage() {
             <input
               required
               type="email"
-              placeholder="name@solugrowth.com"
+              placeholder="name"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
             />
@@ -150,7 +152,11 @@ export function UsersPage() {
         <DataTable
           rows={users as unknown as Array<Record<string, unknown>>}
           columns={[
-            { key: 'email', label: 'Email' },
+            {
+              key: 'email',
+              label: 'Email',
+              render: (value) => formatEmailLocalPart(String(value ?? '')) || '—',
+            },
             {
               key: 'displayName',
               label: 'Name',
@@ -161,13 +167,14 @@ export function UsersPage() {
               label: 'Role',
               render: (_value, row) => {
                 const user = row as unknown as TenantUser;
+                const label = user.displayName || formatEmailLocalPart(user.email) || 'user';
                 return (
                   <select
                     className="inline-select"
                     value={user.role}
                     disabled={!user.isActive}
                     onChange={(e) => void handleRoleChange(user, e.target.value as TenantUserRole)}
-                    aria-label={`Role for ${user.email}`}
+                    aria-label={`Role for ${label}`}
                   >
                     {roles.map((r) => (
                       <option key={r} value={r}>

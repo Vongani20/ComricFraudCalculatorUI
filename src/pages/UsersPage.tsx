@@ -118,7 +118,7 @@ export function UsersPage() {
             <input
               required
               type="email"
-              placeholder="name"
+              placeholder="email address"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
             />
@@ -153,14 +153,12 @@ export function UsersPage() {
           rows={users as unknown as Array<Record<string, unknown>>}
           columns={[
             {
-              key: 'email',
-              label: 'Email',
-              render: (value) => formatEmailLocalPart(String(value ?? '')) || '—',
-            },
-            {
               key: 'displayName',
               label: 'Name',
-              render: (value) => (value ? String(value) : '—'),
+              render: (_value, row) => {
+                const user = row as unknown as TenantUser;
+                return user.displayName || formatEmailLocalPart(user.email) || '—';
+              },
             },
             {
               key: 'role',

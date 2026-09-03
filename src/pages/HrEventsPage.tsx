@@ -80,7 +80,7 @@ export function HrEventsPage() {
     <section>
       <PageHeader
         title="Submit HR Event"
-        description="Submit HR fraud intelligence. Fields map to the HR Intelligence Events model (§3.1.2)."
+        description="Submit HR fraud intelligence for your tenant."
         breadcrumb="Submit HR Event"
       />
 
